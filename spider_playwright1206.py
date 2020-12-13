@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from playwright import sync_playwright
-from playwright.browser_context import BrowserContext
+from playwright.sync_api import BrowserContext
+from playwright.sync_api import Page
 import time
 import pandas as pd
 import json
@@ -9,6 +10,7 @@ from playwright.sync_api import Page
 import requests
 from lxml import etree
 import pandas as pd
+import pysnooper
 
 
 class MoviePage(BrowserContext):
@@ -17,8 +19,15 @@ class MoviePage(BrowserContext):
         self.context = context
     
 
+    @pysnooper.snoop()
     def to_url(self):
         page = self.context.newPage()
+        # page.on("framenavigated", lambda frame: print("Frame navigated to %s" % frame.url))
+        # page.on("request", lambda request: print("Request %s" % request.url))
+        # page.on("requestFinished", lambda request: print("Request finished %s" % request.url))
+        # page.on("response",lambda response: print("Response %s, request %s in frame %s"% (response.url, response.request.url, response.frame.url)),)
+        # page.on("response",lambda response: print(response.status,response.url))
+        # page.on("responseFinished",lambda response: print(response.text))
         # Go to http://59.207.104.12:8090//login
         base_url="https://spa3.scrape.center/"
         print(base_url)
@@ -44,12 +53,24 @@ class MoviePage(BrowserContext):
                 print(last_ele.innerText())
                 page.keyboard.down("PageDown")
                 page.keyboard.down("PageDown")
+                # page.waitForEvent("request")
+                # print("等待发起请求")
+                # page.waitForEvent("response")
+                # print("等待完成响应")
                 last_ele=movie_elements[-1]
                 last_ele.focus()
                 last_ele.scrollIntoViewIfNeeded()
+                try:
+                    page.waitForEvent("request")
+                    print("等待发起请求")
+                    page.waitForEvent("response")
+                    print("等待完成响应")
+                except:
+                    print("滚动条已经处于页面最下方!")
+                    break
                 last_ele.waitForElementState("stable")
-                time.sleep(10)
-                page.waitForLoadState(state='networkidle',timeout=50000)
+                time.sleep(8)
+                # page.waitForLoadState(state='networkidle',timeout=50000)
             else:
                 print("滚动条已经处于页面最下方!")
                 break

@@ -1,6 +1,8 @@
 import playwright
 from playwright.sync_api import Playwright
-
+from playwright import sync_playwright
+from playwright.sync_api import BrowserContext
+from playwright.sync_api import Page
 
 def main(playwright: Playwright):
     #打开浏览器的实例，使用chromium
@@ -68,7 +70,7 @@ def main(playwright: Playwright):
     print("Navigating page2 to https://www.163.com...")
     page2.goto("https://www.163.com",timeout=60000)
     print("Page2 main frame url: %s" % page2.mainFrame.url)
-    print("Page2 tile: %s" % page2.title())
+    print("Page2 title: %s" % page2.title())
     print("Frames in page2: %d" % len(page2.frames))
     print("Pages in context: %d" % len(context.pages))
 

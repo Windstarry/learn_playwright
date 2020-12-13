@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from playwright import sync_playwright
-from playwright.browser_context import BrowserContext
+from playwright.sync_api import BrowserContext
+from playwright.sync_api import Page
 import time
 import pandas as pd
 import json
@@ -18,6 +19,10 @@ class MoviePage(BrowserContext):
 
     def to_url(self,i):
         page = self.context.newPage()
+        page.on("framenavigated", lambda frame: print("Frame navigated to %s" % frame.url))
+        page.on("request", lambda request: print("Request %s" % request.url))
+        page.on("requestFinished", lambda request: print("Request finished %s" % request.url))
+        page.on("response",lambda response: print("Response %s, request %s in frame %s"% (response.url, response.request.url, response.frame.url)),)
         # Go to http://59.207.104.12:8090//login
         base_url="https://spa2.scrape.center/page/{}".format(i)
         print(base_url)
